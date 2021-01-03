@@ -30,8 +30,7 @@
 -export([add/2
 	]).
  
--export([ping/0,
-	 heart_beat/1
+-export([ping/0
 	]).
 
 -export([start/0,
@@ -64,9 +63,6 @@ add(A,B)->
 
 
 %%-----------------------------------------------------------------------
-heart_beat(Interval)->
-    gen_server:cast(?MODULE, {heart_beat,Interval}).
-
 
 %% ====================================================================
 %% Server functions
@@ -82,7 +78,7 @@ heart_beat(Interval)->
 %
 %% --------------------------------------------------------------------
 init([]) ->
-    spawn(fun()->h_beat(?HeartBeatInterval) end),
+
     {ok, #state{}}.
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -98,12 +94,8 @@ handle_call({ping}, _From, State) ->
     Reply={pong,node(),?MODULE},
     {reply, Reply, State};
 
-handle_call({get_state}, _From, State) ->
-     Reply=State,
-    {reply, Reply, State};
-
 handle_call({add,A,B}, _From, State) ->
-     Reply=rpc:call(node(),adder,add,[A,B]),
+     Reply=A+B,
     {reply, Reply, State};
 
 
@@ -121,9 +113,6 @@ handle_call(Request, From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({heart_beat,_Interval}, State) ->
-    ok,  
-    {noreply, State};
 
 handle_cast(Msg, State) ->
     io:format("unmatched match cast ~p~n",[{?MODULE,?LINE,Msg}]),
@@ -165,9 +154,6 @@ code_change(_OldVsn, State, _Extra) ->
 %% Description:
 %% Returns: non
 %% --------------------------------------------------------------------
-h_beat(Interval)->
-    timer:sleep(Interval),
-    rpc:cast(node(),?MODULE,heart_beat,[Interval]).
 
 %% --------------------------------------------------------------------
 %% Internal functions

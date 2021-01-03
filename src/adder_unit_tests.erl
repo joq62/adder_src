@@ -34,7 +34,7 @@ start()->
    
       %% End application tests
     ?debugMsg("Start cleanup"),
-    ?assertEqual(ok,cleanup()),
+  %  ?assertEqual(ok,cleanup()),
     ?debugMsg("Stop cleanup"),
 
     ?debugMsg("------>"++atom_to_list(?MODULE)++" ENDED SUCCESSFUL ---------"),
